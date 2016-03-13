@@ -10,7 +10,6 @@ import com.darcye.sqlite.Table.Column;
 /**
  * 
  * @author Darcy yeguozhong@yeah.net
- * 
  */
 class SqlHelper {
 
@@ -65,12 +64,8 @@ class SqlHelper {
 	}
 
 	/**
-	 * ��model�����ֵӳ�䵽ContentValues��
-	 * 
-	 * ���model�����ֶ�û�и�ֵ��Ҳ����null��ʱ���򲻰Ѹ�ֵӳ�䵽ContentValues
-	 * 
+	 * use reflection to parse model's value to contentValues
 	 * @param model
-	 * @return
 	 */
 	public static void parseModelToContentValues(Object model,
 			ContentValues contentValues) {
@@ -140,12 +135,11 @@ class SqlHelper {
 	}
 
 	/**
-	 * ��queryResult�����ֵӳ�䵽model����
-	 * 
+	 * use reflection to parse queryResult's value into model
 	 * @param queryResult
 	 * @param model
 	 */
-	public static void parseQueryResultToModel(ResultSet queryResult,
+	public static void parseResultSetToModel(ResultSet queryResult,
 			Object model) {
 		Class<?> clazz = model.getClass();
 		Field[] fields = clazz.getDeclaredFields();
@@ -159,50 +153,50 @@ class SqlHelper {
 				Column column = field.getAnnotation(Column.class);
 				if (column == null)
 					continue;
-				fieldVal = queryResult.getProperty(column.name());
+				fieldVal = queryResult.getValue(column.name());
 				fieldType = field.getType();
 				if (fieldVal != null) {
 					if (fieldType.equals(fieldVal.getClass())) {
 						field.set(model, fieldVal);
 					} else if (fieldType.equals(short.class)) {
 						field.setShort(model,
-								queryResult.getShortProperty(column.name()));
+								queryResult.getShortValue(column.name()));
 					} else if (fieldType.equals(Short.class)) {
 						field.set(model, (Short) queryResult
-								.getShortProperty(column.name()));
+								.getShortValue(column.name()));
 					} else if (fieldType.equals(int.class)) {
 						field.setInt(model,
-								queryResult.getIntProperty(column.name()));
+								queryResult.getIntValue(column.name()));
 					} else if (fieldType.equals(Integer.class)) {
 						field.set(model, (Integer) queryResult
-								.getIntProperty(column.name()));
+								.getIntValue(column.name()));
 					} else if (fieldType.equals(long.class)) {
 						field.setLong(model,
-								queryResult.getLongProperty(column.name()));
+								queryResult.getLongValue(column.name()));
 					} else if (fieldType.equals(Long.class)) {
 						field.set(model, (Long) queryResult
-								.getLongProperty(column.name()));
+								.getLongValue(column.name()));
 					} else if (fieldType.equals(float.class)) {
 						field.setFloat(model,
-								queryResult.getFloatProperty(column.name()));
+								queryResult.getFloatValue(column.name()));
 					} else if (fieldType.equals(Float.class)) {
 						field.set(model, (Float) queryResult
-								.getFloatProperty(column.name()));
+								.getFloatValue(column.name()));
 					} else if (fieldType.equals(double.class)) {
 						field.setDouble(model,
-								queryResult.getDoubleProperty(column.name()));
+								queryResult.getDoubleValue(column.name()));
 					} else if (fieldType.equals(Double.class)) {
 						field.set(model, (Double) queryResult
-								.getDoubleProperty(column.name()));
+								.getDoubleValue(column.name()));
 					} else if (fieldType.equals(boolean.class)) {
 						field.setBoolean(model,
-								queryResult.getBooleanProperty(column.name()));
+								queryResult.getBooleanValue(column.name()));
 					} else if (fieldType.equals(Boolean.class)) {
 						field.set(model, (Boolean) queryResult
-								.getBooleanProperty(column.name()));
+								.getBooleanValue(column.name()));
 					} else if (fieldType.equals(String.class)) {
 						field.set(model,
-								queryResult.getStringProperty(column.name()));
+								queryResult.getStringValue(column.name()));
 					} else {
 						field.set(model, fieldVal);
 					}
@@ -214,28 +208,25 @@ class SqlHelper {
 	}
 
 	/**
-	 * ��queryResultList�����ֵӳ�䵽modelList����
 	 * 
 	 * @param queryResultList
 	 * @param mList
 	 * @param mdlType
-	 *            List������������
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public static void parseQueryResultListToModelList(
+	public static void parseResultSetListToModelList(
 			List<ResultSet> queryResultList, List mList, Class<?> mdlType) {
 		try {
-			if (queryResultList == null)
+			if (queryResultList == null || queryResultList.isEmpty())
 				return;
 			for (ResultSet queryResult : queryResultList) {
 				Object model = mdlType.newInstance();
-				parseQueryResultToModel(queryResult, model);
+				parseResultSetToModel(queryResult, model);
 				mList.add(model);
 			}
 		} catch (IllegalAccessException ex) {
 			ex.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

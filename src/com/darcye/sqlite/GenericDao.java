@@ -77,9 +77,12 @@ class GenericDao<T> implements IBaseDao<T> {
 	public List<T> queryByCondition(String[] columns, String selection,
 			String groupBy, String having, String orderBy,
 			String... selectionArgs) {
-		List<T> resultList = new ArrayList<T>();
 		List<ResultSet> queryList = mDb.query(mTableName, columns, selection, groupBy, having, orderBy, selectionArgs);
-		SqlHelper.parseQueryResultListToModelList(queryList, resultList, modelClazz);
+		if(queryList == null || queryList.isEmpty()){
+			return null;
+		}
+		List<T> resultList = new ArrayList<T>();
+		SqlHelper.parseResultSetListToModelList(queryList, resultList, modelClazz);
 		return resultList;
 	}
 	

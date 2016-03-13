@@ -258,7 +258,7 @@ public class DbSqlite {
 	}
 
 	/**
-	 * set data in cursor to QueryResult List
+	 * set data in cursor to ResultSet List
 	 * @param cursor
 	 * @param resultList the data will set in it
 	 */
@@ -281,14 +281,14 @@ public class DbSqlite {
 				case Cursor.FIELD_TYPE_INTEGER:
 					columnVal = cursor.getInt(index);
 					break;
-				case Cursor.FIELD_TYPE_STRING:
-					columnVal = cursor.getString(index);
+				case Cursor.FIELD_TYPE_NULL:
+					columnVal = null;
 					break;
 				default:
 					columnVal = cursor.getString(index);
 					break;
 				}
-				result.setProperty(cursor.getColumnName(index), columnVal);
+				result.setValue(cursor.getColumnName(index), columnVal);
 			}
 			resultList.add(result);
 		}

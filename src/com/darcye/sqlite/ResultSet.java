@@ -8,65 +8,42 @@ import java.util.Map;
 
 /**
  * 
- * <p>
- * 查询结果集
- * </p>
+ * a key value set which corresponds to a row of query results
  * 
- * <p>
- * 类型相关的接口，如
- * <code>getIntProperty<code>等会尽可能地返回相关结果，如果中间结果是long,会自动向下转型,或者是字符串类型，也会尝试去转化整型结果<p>	
- * 
- * <p>if you have any questions in my code, you can contact me at <a href="mailto:yeguozhong@yeah.net">yeguozhong@yeah.net</a>
- * </p>
- * 
- * @author Darcy.Ye
- * @version 2013-11-12 下午4:17:45
- * 
+ * @author Darcy yeguozhong@yeah.net
  */
 public class ResultSet implements Serializable {
 
 	private static final long serialVersionUID = 2510654675439416448L;
 
-	// 保持原来的顺序[列名，值]
 	private Map<String, Object> nameValueMap = new LinkedHashMap<String, Object>();
 
-	// 保持原来的顺序[索引号,值]
 	private Map<Integer, Object> indexValueMap = new LinkedHashMap<Integer, Object>();
 
-	// 列名
 	private List<String> columnNameList = new ArrayList<String>();
 
 	private int index = 0;
 
-	public static final int ERROR_VALUE = 0xFFFFFFFF;
-
 	/**
-	 * 设置某一列的值
+	 * set column value
 	 * 
-	 * @param columnName
-	 *            列名
-	 * @param columnValue
+	 * @param columnName the table column name
+	 * @param columnValue 
 	 */
-	public synchronized void setProperty(String columnName, Object columnValue) {
+	void setValue(String columnName, Object columnValue) {
 		columnName = columnName.toLowerCase();
 		columnNameList.add(columnName);
-		if (columnName != null && columnValue == null) {
-			nameValueMap.put(columnName, "");
-			indexValueMap.put(index, "");
-		} else {
-			nameValueMap.put(columnName, columnValue);
-			indexValueMap.put(index, columnValue);
-		}
-		++index;
+		nameValueMap.put(columnName, columnValue);
+		indexValueMap.put(index++, columnValue);
 	}
 
 	/**
-	 * 改变某index列的值
+	 * change value by index in this result set
 	 * 
 	 * @param index
 	 * @param value
 	 */
-	public void changeProperty(int index, Object value) {
+	public void changeValue(int index, Object value) {
 		if (indexValueMap.containsKey(index)) {
 			indexValueMap.put(index, value);
 			nameValueMap.put(columnNameList.get(index), value);
@@ -74,84 +51,82 @@ public class ResultSet implements Serializable {
 	}
 
 	/**
-	 * 获取某一列的值
+	 * get value by column name
 	 * 
 	 * @param columnName
-	 *            列名
-	 * @return 不存在返回null
+	 * @return return the value of this column
 	 */
-	public Object getProperty(String columnName) {
+	public Object getValue(String columnName) {
 		return nameValueMap.get(columnName.toLowerCase());
 	}
 
 	/**
-	 * 获取Boolean类型值
-	 * 
+	 *  get the boolean value
+	 *  
 	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回false
+	 * @return if the value is a "1" or "true" , return true; or is a "0" or "false", return false.
+	 * @exception ClassCastException
 	 */
-	public boolean getBooleanProperty(String columnName) {
-		Object value = getProperty(columnName);
-		if (value instanceof Boolean) {
-			return (Boolean) value;
-		} else if (value instanceof String) {
-			if (value.equals("true")) {
-				return true;
-			} else if (value.equals("false")) {
-				return false;
-			}
-		} else if (value instanceof Long) {
-			return (Long)value == 1;
-		} else if (value instanceof Integer) {
-			return (Integer)value == 1;
-		} else if (value instanceof Short) {
-			return (Short)value == 1;
+	public boolean getBooleanValue(String columnName) {
+		Object value = getValue(columnName);
+		String strVal = value.toString().toLowerCase();
+		if(strVal.equals("true") || strVal.equals("1")){
+			return true;
+		}else if(strVal.equals("false") || strVal.equals("0")){
+			return false;
 		}
-		return false;
+		throw new ClassCastException(String.format("invalid boolean value : %s ", value));
 	}
 
 	/**
 	 * 
-	 * 获取Long类型值
+	 * get long value
 	 * 
 	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回 ERROR_VALUE
 	 */
-	public long getLongProperty(String columnName) {
-		return (long) getDoubleProperty(columnName);
+	public long getLongValue(String columnName) {
+		return (long) getDoubleValue(columnName);
 	}
 
 	/**
 	 * 
-	 * 获取Int类型值
+	 * get int value
 	 * 
 	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回 ERROR_VALUE
-	 * @see QueryResult.ERROR_VALUE
 	 */
-	public int getIntProperty(String columnName) {
-		return (int) getLongProperty(columnName);
+	public int getIntValue(String columnName) {
+		return (int) getLongValue(columnName);
 	}
 
 	/**
 	 * 
-	 * 获取Short类型值
+	 * get short value
 	 * 
 	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回 ERROR_VALUE
 	 */
-	public short getShortProperty(String columnName) {
-		return (short) getIntProperty(columnName);
+	public short getShortValue(String columnName) {
+		return (short) getIntValue(columnName);
 	}
 
 	/**
-	 * 获取Double类型值
+	 * 
+	 * get float vlue
 	 * 
 	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回ERROR_VALUE
 	 */
-	public double getDoubleProperty(String columnName) {
-		Object value = getProperty(columnName);
+	public float getFloatValue(String columnName) {
+		return (float) getDoubleValue(columnName);
+	}
+	
+	/**
+	 * get double value
+	 * 
+	 * @param columnName
+	 * @return 
+	 * @exception ClassCastException
+	 */
+	public double getDoubleValue(String columnName) {
+		Object value = getValue(columnName);
 		if (value instanceof Double) {
 			return (Double) value;
 		} else if (value instanceof Float) {
@@ -167,55 +142,36 @@ public class ResultSet implements Serializable {
 				return Double.parseDouble((String) value);
 			}
 		}
-		return ERROR_VALUE;
+		throw new ClassCastException(String.format("invalid number %s ", value));
 	}
 
 	/**
 	 * 
-	 * 获取Float类型值
+	 * get String value
 	 * 
 	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回ERROR_VALUE
 	 */
-	public float getFloatProperty(String columnName) {
-		return (float) getDoubleProperty(columnName);
-	}
-
-	/**
-	 * 
-	 * 获取String类型值
-	 * 
-	 * @param columnName
-	 * @return 如果该值不能正常转换，会返回 ""
-	 */
-	public String getStringProperty(String columnName) {
-		Object value = getProperty(columnName);
-		if (value instanceof String) {
-			return (String) value;
-		} else if (value instanceof Double || value instanceof Float
-				|| value instanceof Long || value instanceof Integer
-				|| value instanceof Short) {
-           return String.valueOf(value);
-		}else if(value == null){
-			return "";
-		}else{
+	public String getStringValue(String columnName) {
+		Object value = getValue(columnName);
+		if(value != null){
 			return value.toString();
+		}else{
+			return null;
 		}
 	}
 
 	/**
-	 * 获取第columnIndex列的值
+	 * get value by index
 	 * 
 	 * @param columnIndex
 	 * @return
 	 */
-	public Object getProperty(int columnIndex) {
+	public Object getValue(int columnIndex) {
 		return indexValueMap.get(columnIndex);
 	}
 
 	/**
-	 * 获取列数
-	 * 
+	 * the size of columns
 	 * @return
 	 */
 	public int getSize() {
@@ -223,49 +179,43 @@ public class ResultSet implements Serializable {
 	}
 
 	/**
-	 * 获取【name:value】结果集
-	 * 
+	 * no result
 	 * @return
 	 */
-	public Map<String, Object> getNameValueMap() {
-		return nameValueMap;
-	}
-
-	/**
-	 * 获取【index:value】结果集
-	 * 
-	 * @return
-	 */
-	public Map<Integer, Object> getIndexValueMap() {
-		return indexValueMap;
-	}
-
 	public boolean isEmpty() {
 		return nameValueMap.isEmpty();
 	}
 
+	/**
+	 * get column name by its index
+	 * @param columnNum
+	 * @return
+	 */
+	public String getColumnName(int columnNum){
+		return columnNameList.get(columnNum);
+	}
+	
+	/**
+	 * get index of this column name
+	 * @param columnName
+	 * @return if the column name didn't exsits, return -1
+	 */
+	public int indexOfColumnName(String columnName){
+		return columnNameList.indexOf(columnName.toLowerCase());
+	}
+	
 	@Override
 	public String toString() {
 		return "Result [nameValueMap=" + nameValueMap + "]";
 	}
 	
-	public String getColumnNameByIndex(int columnNum){
-		return columnNameList.get(columnNum);
-	}
-	
-	public int indexOfColumnName(String columnName){
-		return columnNameList.indexOf(columnName.toLowerCase());
-	}
-	
 	/**
-	 * 判断字符串是否符合数字格式
-	 * 
-	 * <p>这个方法不应该属于这里，只是为了方便可以运行
+	 * is this str a valid number
 	 * 
 	 * @param str
-	 * @return
 	 */
-	private  static boolean isNum(String str) {
+	private boolean isNum(String str) {
 		return !str.equals("")&&str.matches("^[-+]?(([0-9]+)([.]([0-9]+))?|([.]([0-9]+))?)$");
 	}
+	
 }
