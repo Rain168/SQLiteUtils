@@ -3,7 +3,7 @@ package com.darcye.sqlite;
 
 /**
  * use this factory to create your sqlite data access object
- * @author Darcy 
+ * @author Darcy yeguozhong@yeah.net
  */
 public class DaoFactory {
 	

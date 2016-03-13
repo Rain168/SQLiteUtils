@@ -8,18 +8,16 @@ import android.content.ContentValues;
 import com.darcye.sqlite.Table.Column;
 
 /**
- * SQL���ĸ�����
  * 
- * @author Darcy
+ * @author Darcy yeguozhong@yeah.net
  * 
  */
 class SqlHelper {
 
 	/**
-	 * ��ȡCreateTable��SQL���
-	 * 
+	 * according to the Class annotations to genarate sql of create table
 	 * @param model
-	 * @return
+	 * @return sql to create table
 	 */
 	public static String getCreateTableSQL(Class<?> clazz,
 			OnPrimaryKeyListener mOnPrimaryKeyListener) {
@@ -50,13 +48,13 @@ class SqlHelper {
 			}
 			sqlBuidler.append(",");
 		}
-		sqlBuidler.deleteCharAt(sqlBuidler.lastIndexOf(","));// ɾ������,��
+		sqlBuidler.deleteCharAt(sqlBuidler.lastIndexOf(","));
 		sqlBuidler.append(")");
 		return sqlBuidler.toString();
 	}
 
 	/**
-	 * ��ȡ������
+	 * get table name
 	 * 
 	 * @param model
 	 * @return
@@ -147,7 +145,7 @@ class SqlHelper {
 	 * @param queryResult
 	 * @param model
 	 */
-	public static void parseQueryResultToModel(QueryResult queryResult,
+	public static void parseQueryResultToModel(ResultSet queryResult,
 			Object model) {
 		Class<?> clazz = model.getClass();
 		Field[] fields = clazz.getDeclaredFields();
@@ -225,12 +223,12 @@ class SqlHelper {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static void parseQueryResultListToModelList(
-			List<QueryResult> queryResultList, List mList, Class<?> mdlType) {
+			List<ResultSet> queryResultList, List mList, Class<?> mdlType) {
 		try {
 			if (queryResultList == null)
 				return;
-			for (QueryResult queryResult : queryResultList) {
-				Object model = mdlType.newInstance(); // ����������Ϣ��ȡһ������
+			for (ResultSet queryResult : queryResultList) {
+				Object model = mdlType.newInstance();
 				parseQueryResultToModel(queryResult, model);
 				mList.add(model);
 			}

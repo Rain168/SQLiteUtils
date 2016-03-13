@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 /**
  * a simple class to encapsulate the db operations, remember :
  * <strong >don't </strong>forget to {@link #closeDB()} when you don't need to connect to database.
- * @author Darcy
+ * @author Darcy yeguozhong@yeah.net
  * 
  */
 public class DbSqlite {
@@ -137,16 +137,16 @@ public class DbSqlite {
 	/**
 	 * a more flexible query by condition
 	 * 
-	 * @param table
-	 * @param columns
-	 * @param selection
-	 * @param groupBy
-	 * @param having
-	 * @param orderBy
-	 * @param selectionArgs
-	 * @return if exceptions 
+	 * @param table The table name to compile the query against.
+	 * @param columns  A list of which columns to return. Passing null will return all columns, which is discouraged to prevent reading data from storage that isn't going to be used.
+	 * @param selection  A filter declaring which rows to return, formatted as an SQL WHERE clause (excluding the WHERE itself). Passing null will return all rows for the given table.
+	 * @param groupBy  A filter declaring how to group rows, formatted as an SQL GROUP BY clause (excluding the GROUP BY itself). Passing null will cause the rows to not be grouped.
+	 * @param having A filter declare which row groups to include in the cursor, if row grouping is being used, formatted as an SQL HAVING clause (excluding the HAVING itself). Passing null will cause all row groups to be included, and is required when row grouping is not being used.
+	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
+	 * @param selectionArgs selectionArgs You may include ?s in selection, which will be replaced by the values from selectionArgs, in order that they appear in the selection. The values will be bound as Strings.
+	 * @return if exceptions happen or no match records, then return null
 	 */
-	public List<QueryResult> query(String table, String[] columns,
+	public List<ResultSet> query(String table, String[] columns,
 			String selection, String groupBy, String having, String orderBy,
 			String... selectionArgs) {
 		Cursor cursor = null;
@@ -154,9 +154,13 @@ public class DbSqlite {
 			openDB();
 			cursor = mSQLiteDatabase.query(table, columns, selection,
 					selectionArgs, groupBy, having, orderBy);
-			List<QueryResult>  resultList = new ArrayList<QueryResult>();
-			parseCursorToResult(cursor, resultList);
-			return resultList;
+			if(cursor.getCount() < 1){
+				return null;
+			}else{
+				List<ResultSet>  resultList = new ArrayList<ResultSet>();
+				parseCursorToResult(cursor, resultList);
+				return resultList;
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return null;
@@ -175,7 +179,7 @@ public class DbSqlite {
 	 * @param selectionArgs
 	 * @return
 	 */
-	public List<QueryResult> query(String table, String[] columns,
+	public List<ResultSet> query(String table, String[] columns,
 			String selection, String... selectionArgs) {
 		return query(table, columns, selection, null, null, null, selectionArgs);
 	}
@@ -202,16 +206,19 @@ public class DbSqlite {
 	/**
 	 * execute raw query sql
 	 * 
-	 * @param sql
-	 * @param bindArgs
-	 * @return 
+	 * @param sql the SQL query. The SQL string must not be ; terminated
+	 * @param bindArgs You may include ?s in where clause in the query, which will be replaced by the values from selectionArgs. The values will be bound as Strings.
+	 * @return return result as List or null
 	 */
-	public List<QueryResult> execQuerySQL(String sql, String... bindArgs){
+	public List<ResultSet> execQuerySQL(String sql, String... bindArgs){
 		Cursor cursor = null;
 		try{
-			List<QueryResult>  resultList = new ArrayList<QueryResult>();
 			openDB();
 			cursor = mSQLiteDatabase.rawQuery(sql, bindArgs);
+			if(cursor.getCount() < 1){
+				return null;
+			}
+			List<ResultSet>  resultList = new ArrayList<ResultSet>();
 			parseCursorToResult(cursor, resultList);
 			return resultList;
 		}catch(SQLException ex) {
@@ -255,13 +262,13 @@ public class DbSqlite {
 	 * @param cursor
 	 * @param resultList the data will set in it
 	 */
-	private void parseCursorToResult(Cursor cursor,List<QueryResult> resultList){
+	private void parseCursorToResult(Cursor cursor,List<ResultSet> resultList){
 		int columnCount;
 		int columnType;
 		Object columnVal = null;
 		while (cursor.moveToNext()) {
 			columnCount = cursor.getColumnCount();
-			QueryResult result = new QueryResult();
+			ResultSet result = new ResultSet();
 			for (int index = 0; index < columnCount; ++index) {
 				columnType = cursor.getType(index);
 				switch (columnType) {

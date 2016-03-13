@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
  * 
  * a transction support class
  * 
- * @author Darcy
+ * @author Darcy yeguozhong@yeah.net
  */
 public class DBTransction {
 
