@@ -2,6 +2,7 @@ package com.darcye.sqlite;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class ResultSet implements Serializable {
 	}
 
 	/**
-	 *  get the boolean value
+	 *  get boolean type value
 	 *  
 	 * @param columnName
 	 * @return if the value is a "1" or "true" , return true; or is a "0" or "false", return false.
@@ -80,7 +81,7 @@ public class ResultSet implements Serializable {
 
 	/**
 	 * 
-	 * get long value
+	 * get long type value
 	 * 
 	 * @param columnName
 	 */
@@ -90,7 +91,7 @@ public class ResultSet implements Serializable {
 
 	/**
 	 * 
-	 * get int value
+	 * get int type value
 	 * 
 	 * @param columnName
 	 */
@@ -100,7 +101,7 @@ public class ResultSet implements Serializable {
 
 	/**
 	 * 
-	 * get short value
+	 * get short type value
 	 * 
 	 * @param columnName
 	 */
@@ -110,7 +111,7 @@ public class ResultSet implements Serializable {
 
 	/**
 	 * 
-	 * get float vlue
+	 * get float type vlue
 	 * 
 	 * @param columnName
 	 */
@@ -119,7 +120,7 @@ public class ResultSet implements Serializable {
 	}
 	
 	/**
-	 * get double value
+	 * get double type value
 	 * 
 	 * @param columnName
 	 * @return 
@@ -147,7 +148,7 @@ public class ResultSet implements Serializable {
 
 	/**
 	 * 
-	 * get String value
+	 * get String type value
 	 * 
 	 * @param columnName
 	 */
@@ -160,6 +161,25 @@ public class ResultSet implements Serializable {
 		}
 	}
 
+	/**
+	 * get Date type value
+	 * @param columnName
+	 * @return
+	 */
+	public Date getDateValue(String columnName){
+		String value = getStringValue(columnName);
+		return DateUtils.parseStr2Date(value);
+	}
+	
+	/**
+	 * get byte[] type value
+	 * @param columnName
+	 * @return
+	 */
+	public byte[] getBlobValue(String columnName){
+		return (byte[])getValue(columnName);
+	}
+	
 	/**
 	 * get value by index
 	 * 

@@ -1,6 +1,7 @@
 package com.darcye.sqlite;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -124,11 +125,13 @@ class SqlHelper {
 					contentValues.put(column.name(), (String) field.get(model));
 				} else if (fieldType.equals(byte[].class)) {
 					contentValues.put(column.name(), (byte[]) field.get(model));
+				} else if(fieldType.equals(Date.class)){
+					Date date = (Date)field.get(model);
+					contentValues.put(column.name(),DateUtils.formatDate2Str(date));
 				}
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -153,52 +156,48 @@ class SqlHelper {
 				Column column = field.getAnnotation(Column.class);
 				if (column == null)
 					continue;
-				fieldVal = queryResult.getValue(column.name());
+				String columnName = column.name();
+				fieldVal = queryResult.getValue(columnName);
 				fieldType = field.getType();
 				if (fieldVal != null) {
 					if (fieldType.equals(fieldVal.getClass())) {
 						field.set(model, fieldVal);
 					} else if (fieldType.equals(short.class)) {
-						field.setShort(model,
-								queryResult.getShortValue(column.name()));
+						field.setShort(model,queryResult.getShortValue(columnName));
 					} else if (fieldType.equals(Short.class)) {
-						field.set(model, (Short) queryResult
-								.getShortValue(column.name()));
+						field.set(model, (Short) queryResult.getShortValue(columnName));
 					} else if (fieldType.equals(int.class)) {
-						field.setInt(model,
-								queryResult.getIntValue(column.name()));
+						field.setInt(model,queryResult.getIntValue(columnName));
 					} else if (fieldType.equals(Integer.class)) {
-						field.set(model, (Integer) queryResult
-								.getIntValue(column.name()));
+						field.set(model, (Integer) queryResult.getIntValue(columnName));
 					} else if (fieldType.equals(long.class)) {
 						field.setLong(model,
-								queryResult.getLongValue(column.name()));
+								queryResult.getLongValue(columnName));
 					} else if (fieldType.equals(Long.class)) {
 						field.set(model, (Long) queryResult
-								.getLongValue(column.name()));
+								.getLongValue(columnName));
 					} else if (fieldType.equals(float.class)) {
 						field.setFloat(model,
-								queryResult.getFloatValue(column.name()));
+								queryResult.getFloatValue(columnName));
 					} else if (fieldType.equals(Float.class)) {
 						field.set(model, (Float) queryResult
-								.getFloatValue(column.name()));
+								.getFloatValue(columnName));
 					} else if (fieldType.equals(double.class)) {
 						field.setDouble(model,
-								queryResult.getDoubleValue(column.name()));
+								queryResult.getDoubleValue(columnName));
 					} else if (fieldType.equals(Double.class)) {
 						field.set(model, (Double) queryResult
-								.getDoubleValue(column.name()));
+								.getDoubleValue(columnName));
 					} else if (fieldType.equals(boolean.class)) {
 						field.setBoolean(model,
-								queryResult.getBooleanValue(column.name()));
+								queryResult.getBooleanValue(columnName));
 					} else if (fieldType.equals(Boolean.class)) {
 						field.set(model, (Boolean) queryResult
-								.getBooleanValue(column.name()));
+								.getBooleanValue(columnName));
 					} else if (fieldType.equals(String.class)) {
-						field.set(model,
-								queryResult.getStringValue(column.name()));
-					} else {
-						field.set(model, fieldVal);
+						field.set(model,queryResult.getStringValue(columnName));
+					} else if(fieldType.equals(Date.class)){
+						field.set(model, queryResult.getDateValue(columnName));
 					}
 				}
 			}

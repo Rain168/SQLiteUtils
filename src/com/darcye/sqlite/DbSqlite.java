@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -19,21 +18,24 @@ public class DbSqlite {
 	
 	private SQLiteDatabase mSQLiteDatabase;
 
-	private Context mContext;
-
-	private String dbName;
+	private String dbPath;
 
 	/**
 	 * constructor would create or open the database
 	 * @param context
 	 * @param dbName
 	 */
-	public DbSqlite(Context context, String dbName) {
-		this.mContext = context;
-		this.dbName = dbName;
-		mSQLiteDatabase = mContext.openOrCreateDatabase(this.dbName, Context.MODE_PRIVATE,null);
+	public DbSqlite(String dbPath) {
+		this.dbPath = dbPath;
+		openDB();
 	}
 
+	public DbSqlite(SQLiteDatabase db){
+		this.mSQLiteDatabase = db;
+		this.dbPath = db.getPath();
+		openDB();
+	}
+	
 	public SQLiteDatabase getSQLiteDatabase(){
 		return mSQLiteDatabase;
 	}
@@ -188,8 +190,7 @@ public class DbSqlite {
 	 * Execute a single SQL statement that is NOT a SELECT/INSERT/UPDATE/DELETE. 
 	 * 
 	 * @param sql
-	 * @param bindArgsonly
-	 *            byte[], String, Long and Double are supported in bindArgs.
+	 * @param bindArgs 
 	 * @return
 	 */
 	public boolean execSQL(String sql, Object... bindArgs) {
@@ -236,8 +237,7 @@ public class DbSqlite {
 	 */
 	public void openDB() {
 		if (mSQLiteDatabase.isOpen() == false)
-			mSQLiteDatabase = mContext.openOrCreateDatabase(this.dbName,
-					Context.MODE_PRIVATE, null);
+			mSQLiteDatabase = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
 	}
 
 	/**
@@ -249,12 +249,9 @@ public class DbSqlite {
 		}
 	}
 
-	public Context getContext() {
-		return mContext;
-	}
 
-	public String getDbName() {
-		return dbName;
+	public String getDbPath() {
+		return dbPath;
 	}
 
 	/**

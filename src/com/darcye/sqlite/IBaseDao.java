@@ -43,7 +43,6 @@ public interface IBaseDao<T> {
 	 */
 	int update(T model, String whereClause, String... whereArgs);
 
-	
 	/**
 	 * delete by condition
 	 * 

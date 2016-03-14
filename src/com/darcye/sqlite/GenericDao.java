@@ -99,7 +99,7 @@ class GenericDao<T> implements IBaseDao<T> {
 	@Override
 	public T queryFirstRecord(String selection, String... selectionArgs) {
 		List<T> resultList = queryByCondition(selection, selectionArgs);
-		if(resultList!=null&&resultList.size()==1){
+		if(resultList!=null && !resultList.isEmpty()){
 			return resultList.get(0);
 		}else{
 			return null;

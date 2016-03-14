@@ -29,11 +29,12 @@ public @interface Table {
    public @interface Column {
    	
    	public static final String TYPE_INTEGER = "INTEGER";
+   	public static final String TYPE_LONG = "INTEGER";
    	public static final String TYPE_STRING = "TEXT";
-   	public static final String TYPE_TIMESTAMP ="TIMESTAMP";
-   	public static final String TYPE_BOOLEAN = "BOOLEAN";
-   	public static final String TYPE_FLOAT = "FLOAT";
-   	public static final String TYPE_DOUBLE = "DOUBLE";
+   	public static final String TYPE_TIMESTAMP ="TEXT";
+   	public static final String TYPE_BOOLEAN = "INTEGER";
+   	public static final String TYPE_FLOAT = "REAL";
+   	public static final String TYPE_DOUBLE = "REAL";
    	public static final String TYPE_BLOB = "BLOB";
    	
    	public static final class DEFAULT_VALUE{
