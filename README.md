@@ -56,7 +56,12 @@ userDAO.update(user, "user_name=?", "darcy");
 ```
 查询结果:
 ```java
+//单条结果查询
 UserModel user = userDAO.queryFirstRecord("user_name=?", "darcy");
 
-List<UserModel> userList = userDAO.queryByCondition("user_name=? and weight > ?", "darcy" , "60");
+//一般查询
+List<UserModel> userList = userDAO.query("user_name=? and weight > ?", "darcy" , "60");
+
+//分页查询
+PagingList<UserModel> pagingList = userDAO.pagingQuery(null, null, 1, 3);
 ```

@@ -1,7 +1,9 @@
 package com.darcye.sqlite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -15,6 +17,8 @@ import android.database.sqlite.SQLiteDatabase;
  * 
  */
 public class DbSqlite {
+	
+	private final static Map<String,String> TABLEPKEY = new HashMap<String,String>();
 	
 	private SQLiteDatabase mSQLiteDatabase;
 
@@ -149,8 +153,7 @@ public class DbSqlite {
 	 * @return if exceptions happen or no match records, then return null
 	 */
 	public List<ResultSet> query(String table, String[] columns,
-			String selection, String groupBy, String having, String orderBy,
-			String... selectionArgs) {
+			String selection,String[] selectionArgs, String groupBy, String having, String orderBy) {
 		Cursor cursor = null;
 		try {
 			openDB();
@@ -182,10 +185,72 @@ public class DbSqlite {
 	 * @return
 	 */
 	public List<ResultSet> query(String table, String[] columns,
-			String selection, String... selectionArgs) {
-		return query(table, columns, selection, null, null, null, selectionArgs);
+			String selection, String[] selectionArgs) {
+		return query(table, columns, selection, selectionArgs, null, null, null);
 	}
 
+	/**
+	 * paging query
+	 * 
+	 * @param table
+	 * @param columns
+	 * @param selection
+	 * @param selectionArgs
+	 * @param groupBy
+	 * @param having
+	 * @param orderBy cann't be null if define page and pageSize 
+	 * @param page first page is 1
+	 * @param pageSize
+	 * @return
+	 */
+	public PagingList<ResultSet> pagingQuery(String table, String[] columns,
+			String selection,String[] selectionArgs, String groupBy, String having, String orderBy,int page,int pageSize){
+		
+		if(orderBy == null && pageSize != 0)
+			throw new SQLException("orderBy cann't be null if define page and pageSize");
+		
+		String orderWithLimit;
+		if(orderBy != null && pageSize != 0){
+			orderWithLimit = String.format("%s LIMIT %s , %s", orderBy, (page-1)*pageSize, pageSize);
+		}else{
+			orderWithLimit = orderBy;
+		}
+		
+		Cursor cursor = null;
+		Cursor totalCursor = null;
+		try {
+			openDB();
+			
+			PagingList<ResultSet>  resultList = new PagingList<ResultSet>();
+			
+			totalCursor = mSQLiteDatabase.query(table, new String[]{"count(*) as totalSize"}, selection,
+					selectionArgs, groupBy, having,null);
+			
+			if(totalCursor.moveToNext()){
+				int totalSize = totalCursor.getInt(0);
+				resultList.setTotalSize(totalSize);
+			}
+			
+			cursor = mSQLiteDatabase.query(table, columns, selection,
+					selectionArgs, groupBy, having, orderWithLimit);
+			
+			if(cursor.getCount() < 1){
+				return resultList;
+			}else{
+				parseCursorToResult(cursor, resultList);
+				return resultList;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		} finally {
+			if(cursor!=null)
+				cursor.close();
+			if(totalCursor != null)
+				totalCursor.close();
+		}
+	}
+	
 	/**
 	 * Execute a single SQL statement that is NOT a SELECT/INSERT/UPDATE/DELETE. 
 	 * 

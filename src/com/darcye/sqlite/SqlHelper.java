@@ -65,6 +65,27 @@ class SqlHelper {
 	}
 
 	/**
+	 * get primary key
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	public static String getPrimaryKey(Class<?> clazz){
+		Field[] fields = clazz.getDeclaredFields();
+		for (Field field : fields) {
+			if (field.isAccessible() == false)
+				field.setAccessible(true);
+			Column column = field.getAnnotation(Column.class);
+			if (column == null)
+				continue;
+			if (column.isPrimaryKey()) {
+				return column.name();
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * use reflection to parse model's value to contentValues
 	 * @param model
 	 */

@@ -63,21 +63,20 @@ class GenericDao<T> implements IBaseDao<T> {
 	}
 
 	@Override
-	public List<T> queryByCondition(String selection, String... selectionArgs) {
-		return queryByCondition(null, selection, null, selectionArgs);
+	public List<T> query(String selection, String[] selectionArgs) {
+		return query(null, selection, selectionArgs, null);
 	}
 
 	@Override
-	public List<T> queryByCondition(String[] columns, String selection,
-			String orderBy, String... selectionArgs) {
-		return queryByCondition(columns, selection, null, null, orderBy, selectionArgs);
+	public List<T> query(String[] columns, String selection,String[] selectionArgs,
+			String orderBy) {
+		return query(columns, selection, selectionArgs, null, null, orderBy);
 	}
 
 	@Override
-	public List<T> queryByCondition(String[] columns, String selection,
-			String groupBy, String having, String orderBy,
-			String... selectionArgs) {
-		List<ResultSet> queryList = mDb.query(mTableName, columns, selection, groupBy, having, orderBy, selectionArgs);
+	public List<T> query(String[] columns, String selection,String[] selectionArgs,
+			String groupBy, String having, String orderBy) {
+		List<ResultSet> queryList = mDb.query(mTableName, columns, selection, selectionArgs, groupBy, having, orderBy);
 		if(queryList == null || queryList.isEmpty()){
 			return null;
 		}
@@ -98,11 +97,50 @@ class GenericDao<T> implements IBaseDao<T> {
 
 	@Override
 	public T queryFirstRecord(String selection, String... selectionArgs) {
-		List<T> resultList = queryByCondition(selection, selectionArgs);
+		List<T> resultList = query(selection, selectionArgs);
 		if(resultList!=null && !resultList.isEmpty()){
 			return resultList.get(0);
 		}else{
 			return null;
 		}
 	}
+
+	@Override
+	public List<T> queryAll() {
+		return query(null, null);
+	}
+
+	
+	@Override
+	public PagingList<T> pagingQuery(String[] columns, String selection,
+			String[] selectionArgs, String groupBy, String having,
+			String orderBy, int page, int pageSize) {
+		if(orderBy == null){
+			orderBy = SqlHelper.getPrimaryKey(modelClazz);
+		}
+		
+		PagingList<ResultSet> queryList = mDb.pagingQuery(mTableName, columns, selection, selectionArgs, 
+				groupBy, having, orderBy, page, pageSize);
+		
+		if(queryList == null){
+			return null;
+		}
+		
+		PagingList<T> resultList = new PagingList<T>();
+		resultList.setTotalSize(queryList.getTotalSize());
+		SqlHelper.parseResultSetListToModelList(queryList, resultList, modelClazz);
+		return resultList;
+	}
+
+	@Override
+	public PagingList<T> pagingQuery(String selection, String[] selectionArgs, int page, int pageSize) {
+		return pagingQuery(null, selection, selectionArgs, null,page,pageSize);
+	}
+
+	@Override
+	public PagingList<T> pagingQuery(String[] columns, String selection,
+			String[] selectionArgs, String orderBy, int page, int pageSize) {
+		return pagingQuery(columns, selection, selectionArgs, null, null, orderBy, page, pageSize);
+	}
+
 }

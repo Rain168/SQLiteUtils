@@ -13,6 +13,7 @@ import android.util.Log;
 import com.darcye.sqlite.DaoFactory;
 import com.darcye.sqlite.DbSqlite;
 import com.darcye.sqlite.IBaseDao;
+import com.darcye.sqlite.PagingList;
 
 public class DbTester extends InstrumentationTestCase{
 	
@@ -57,8 +58,13 @@ public class DbTester extends InstrumentationTestCase{
 	}
 	
 	public void testQueryList(){
-		List<UserModel> userList = userDAO.queryByCondition("user_name=? and weight > ?", "darcy" , "60");
+		List<UserModel> userList = userDAO.query("user_name=? and weight > ?", new String[]{"darcy" , "60"});
 		Log.i(TAG, userList.toString());
+	}
+	
+	public void testPagingQuery(){
+		PagingList<UserModel> pagingList = userDAO.pagingQuery(null, null, 1, 3);
+		Log.i(TAG, "total size:"+pagingList.getTotalSize());
 	}
 	
 	@Override

@@ -54,30 +54,36 @@ public interface IBaseDao<T> {
 
 
 	/**
-	 * delete all rows
+	 * delete all records
 	 * @return success return true, else return false
 	 */
 	boolean deleteAll();
 	
 	/**
-	 * query by condition
+	 * get all records in this table
+	 * @return
+	 */
+	List<T> queryAll();
+	
+	/**
+	 * query by condition, it will contain all columns
 	 * 
 	 * @param selection 
 	 * @param selectionArgs 
 	 * @return if exceptions happen or no match records, then return null
 	 */
-	List<T> queryByCondition(String selection, String... selectionArgs);
+	List<T> query(String selection, String[] selectionArgs);
 
 	/**
-	 *  query by condition
+	 * query by condition
 	 * @param columns
 	 * @param selection
 	 * @param orderBy
 	 * @param selectionArgs
 	 * @return if exceptions happen or no match records, then return null
 	 */
-	List<T> queryByCondition(String[] columns, String selection,
-			String orderBy, String... selectionArgs);
+	List<T> query(String[] columns, String selection,String[] selectionArgs,
+			String orderBy);
 
 	/**
 	 * query by condition
@@ -89,9 +95,41 @@ public interface IBaseDao<T> {
 	 * @param selectionArgs You may include ?s in selection, which will be replaced by the values from selectionArgs, in order that they appear in the selection. The values will be bound as Strings.
 	 * @return if exceptions happen or no match records, then return null
 	 */
-	List<T> queryByCondition(String[] columns, String selection,
-			String groupBy, String having, String orderBy,
-			String... selectionArgs);
+	List<T> query(String[] columns, String selection,String[] selectionArgs,
+			String groupBy, String having, String orderBy);
+	
+	
+	/**
+	 * query table's records by paging
+	 * @param selection
+	 * @param selectionArgs
+	 * @return
+	 */
+	PagingList<T> pagingQuery(String selection,String[] selectionArgs,int page,int pageSize);
+	
+	/**
+	 * query table's records by paging
+	 * @param columns
+	 * @param selection
+	 * @param selectionArgs
+	 * @return
+	 */
+	PagingList<T> pagingQuery(String[] columns, String selection,String[] selectionArgs,String orderBy,int page,int pageSize);
+	
+	/**
+	 * query table's records by paging
+	 * @param columns
+	 * @param selection
+	 * @param selectionArgs
+	 * @param groupBy
+	 * @param having
+	 * @param orderBy 
+	 * @param page first page is 1
+	 * @param pageSize
+	 * @return
+	 */
+	PagingList<T> pagingQuery(String[] columns, String selection,String[] selectionArgs,
+			String groupBy, String having, String orderBy,int page,int pageSize);
 	
 	/**
 	 * if your query condition have only one record, this is helpful.
