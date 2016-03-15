@@ -65,3 +65,12 @@ List<UserModel> userList = userDAO.query("user_name=? and weight > ?", "darcy" ,
 //分页查询
 PagingList<UserModel> pagingList = userDAO.pagingQuery(null, null, 1, 3);
 ```
+事务支持:
+```java
+new DBTransction(this , new DBTransction.DBTransctionInterface(){
+		@Override
+		public void onTransction() {
+			// to do 		
+		}
+}).process();
+```
