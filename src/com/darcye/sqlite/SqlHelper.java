@@ -1,6 +1,7 @@
 package com.darcye.sqlite;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,8 +20,7 @@ class SqlHelper {
 	 * @param model
 	 * @return sql to create table
 	 */
-	public static String getCreateTableSQL(Class<?> clazz,
-			OnPrimaryKeyListener mOnPrimaryKeyListener) {
+	public static String getCreateTableSQL(Class<?> clazz) {
 		StringBuilder sqlBuidler = new StringBuilder();
 		Table table = clazz.getAnnotation(Table.class);
 		sqlBuidler.append("CREATE TABLE IF NOT EXISTS ");
@@ -36,13 +36,16 @@ class SqlHelper {
 			sqlBuidler.append(column.name() + " ");
 			sqlBuidler.append(column.type() + " ");
 			if (!column.isNull()) {
-				sqlBuidler.append(" NOT NULL");
+				sqlBuidler.append(" NOT NULL ");
 			}
 			if (column.isPrimaryKey()) {
 				sqlBuidler.append(" PRIMARY KEY ");
-				if (mOnPrimaryKeyListener != null)
-					mOnPrimaryKeyListener.onGetPrimaryKey(column.name());
 			}
+			
+			if(column.isUnique()){
+				sqlBuidler.append(" UNIQUE ");
+			}
+			
 			if (!column.defaultValue().equals("null")) {
 				sqlBuidler.append(" DEFAULT " + column.defaultValue());
 			}
@@ -64,6 +67,72 @@ class SqlHelper {
 		return table.name();
 	}
 
+	/**
+	 * return table version
+	 * @param clazz
+	 * @return
+	 */
+	public static int getTableVersion(Class<?> clazz){
+		Table table = clazz.getAnnotation(Table.class);
+		return table.version();
+	}
+	
+	/**
+	 * return info about table's all columns
+	 * @param clazz
+	 * @return
+	 */
+	public static List<ColumnInfo> getTableColumnInfos(Class<?> clazz){
+		Field[] fields = clazz.getDeclaredFields();
+		List<ColumnInfo> columnInfos = new ArrayList<ColumnInfo>();
+		for (Field field : fields) {
+			if (field.isAccessible() == false)
+				field.setAccessible(true);
+			Column column = field.getAnnotation(Column.class);
+			if (column == null)
+				continue;
+			
+			ColumnInfo columnInfo = new ColumnInfo();
+			columnInfo.setName(column.name());
+			columnInfo.setType(column.type());
+			columnInfo.setNull(column.isNull());
+			columnInfo.setPrimaryKey(column.isPrimaryKey());
+			columnInfo.setUnique(column.isUnique());
+			columnInfo.setDefaultValue(column.defaultValue());
+			columnInfos.add(columnInfo);
+		}
+		return columnInfos;
+	}
+	
+	/**
+	 * return sql of add a columm to table
+	 * @param table
+	 * @param columnInfo
+	 * @return
+	 */
+	public static String getAddColumnSql(String table ,ColumnInfo columnInfo){
+		StringBuilder sbSql = new StringBuilder();
+		sbSql.append(String.format("ALTER TABLE %s ADD %s %s ", table, columnInfo.getName(),columnInfo.getType()));
+		if (!columnInfo.isNull()) {
+			sbSql.append(" NOT NULL ");
+		}
+		if (columnInfo.isPrimaryKey()) {
+			sbSql.append(" PRIMARY KEY ");
+		}
+		
+		if(columnInfo.isUnique()){
+			sbSql.append(" UNIQUE ");
+		}
+		
+		if (!columnInfo.getDefaultValue().equals("null")) {
+			sbSql.append(" DEFAULT " + columnInfo.getDefaultValue());
+		}
+		
+		sbSql.append(";");
+		
+		return sbSql.toString();
+	}
+	
 	/**
 	 * get primary key
 	 * 
@@ -251,7 +320,4 @@ class SqlHelper {
 		}
 	}
 
-	public interface OnPrimaryKeyListener {
-		void onGetPrimaryKey(String keyName);
-	}
 }

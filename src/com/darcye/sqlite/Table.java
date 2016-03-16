@@ -19,6 +19,11 @@ public @interface Table {
 	 */
    public String name();
    
+   /**
+    * table version, if this value diff from the previous one, it will update this table
+    * @return
+    */
+   public int version() default 1;
    
    /**
     * model field annotation corresponding to table column
@@ -29,7 +34,7 @@ public @interface Table {
    public @interface Column {
    	
    	public static final String TYPE_INTEGER = "INTEGER";
-   	public static final String TYPE_LONG = "INTEGER";
+   	public static final String TYPE_LONG = "NUMERIC";
    	public static final String TYPE_STRING = "TEXT";
    	public static final String TYPE_TIMESTAMP ="TEXT";
    	public static final String TYPE_BOOLEAN = "INTEGER";
@@ -53,7 +58,7 @@ public @interface Table {
    	
    	public boolean isNull()default true;
    	
-   	
+   	public boolean isUnique()default false;
    }
 
 }

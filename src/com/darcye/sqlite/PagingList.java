@@ -14,8 +14,19 @@ public class PagingList<T> extends ArrayList<T>{
 	
 	private int mTotalSize;
 	
+	/**
+	 * return total size of your query condition
+	 * @return
+	 */
 	public int getTotalSize(){
 		return mTotalSize;
+	}
+	
+	/**
+	 * return size of this paing query
+	 */
+	public int size() {
+		return super.size();
 	}
 	
 	void setTotalSize(int totalSize){

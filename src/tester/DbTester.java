@@ -1,12 +1,13 @@
 package tester;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 
 import junit.framework.Assert;
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 
@@ -19,6 +20,14 @@ public class DbTester extends InstrumentationTestCase{
 	
 	private static final String TAG = "DbTester";
 	
+	private static final String DB_PATH = Environment.getExternalStorageDirectory().getPath() + "/SQLite/";
+	
+	static{
+		File dbPath = new File(DB_PATH);
+		if(!dbPath.exists())
+			dbPath.mkdirs();
+	}
+	
 	private IBaseDao<UserModel> userDAO;
 	private DbSqlite dbSqlite;
 	
@@ -26,8 +35,8 @@ public class DbTester extends InstrumentationTestCase{
 	protected void setUp() throws Exception {
 		super.setUp();
 		Context context = getInstrumentation().getContext();
-		SQLiteDatabase db = context.openOrCreateDatabase("test.db", Context.MODE_PRIVATE, null);
-		dbSqlite = new DbSqlite(db);
+		SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(DB_PATH+"test.db" , null);
+		dbSqlite = new DbSqlite(context,db);
 		userDAO = DaoFactory.createGenericDao(dbSqlite, UserModel.class);
 	}
 	
@@ -38,6 +47,7 @@ public class DbTester extends InstrumentationTestCase{
 	public void testInsertRecord(){
 		UserModel user = new UserModel();
 		user.userName = "darcy";
+		user.idCard = System.currentTimeMillis();
 		user.isLogin = true;
 		user.weight = 60.5;
 		user.bornDate = new Date();
@@ -54,7 +64,7 @@ public class DbTester extends InstrumentationTestCase{
 	
 	public void testQueryRecord(){
 		UserModel user = userDAO.queryFirstRecord("user_name=?", "darcy");
-		Assert.assertEquals(user.weight, 88.0);
+		Log.i(TAG, user.toString());
 	}
 	
 	public void testQueryList(){
@@ -65,6 +75,10 @@ public class DbTester extends InstrumentationTestCase{
 	public void testPagingQuery(){
 		PagingList<UserModel> pagingList = userDAO.pagingQuery(null, null, 1, 3);
 		Log.i(TAG, "total size:"+pagingList.getTotalSize());
+	}
+	
+	public void testAddColumn(){
+		userDAO.updateTable();
 	}
 	
 	@Override

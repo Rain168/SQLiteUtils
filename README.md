@@ -1,5 +1,5 @@
-# SQLiteUtils
-一个简单的基于Android的Sqlite数据库的操作封装，可以让你通过操作对象来操作表。
+﻿# SQLiteUtils
+一个简单的基于Android的Sqlite数据库的操作封装，可以让你通过操作对象来操作表，支持分页查询。
 
 # 简单的示例代码:
 
@@ -73,4 +73,21 @@ new DBTransction(this , new DBTransction.DBTransctionInterface(){
 			// to do 		
 		}
 }).process();
+```
+更新表[只支持添加字段]:
+```java
+@Table(name="t_user" , version=2) //修改表版本
+public class UserModel {
+	//members above...
+	
+	//new columns
+	
+	@Table.Column(name="new_column_1",type=Column.TYPE_INTEGER)
+	public Integer newColumn;
+	
+	@Table.Column(name="new_column_2",type=Column.TYPE_INTEGER)
+	public Integer newColumn2;
+}
+
+userDAO.updateTable();
 ```

@@ -1,11 +1,10 @@
 package com.darcye.sqlite;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,7 +17,7 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public class DbSqlite {
 	
-	private final static Map<String,String> TABLEPKEY = new HashMap<String,String>();
+	private Context mContext;
 	
 	private SQLiteDatabase mSQLiteDatabase;
 
@@ -34,7 +33,8 @@ public class DbSqlite {
 		openDB();
 	}
 
-	public DbSqlite(SQLiteDatabase db){
+	public DbSqlite(Context context, SQLiteDatabase db){
+		this.mContext = context;
 		this.mSQLiteDatabase = db;
 		this.dbPath = db.getPath();
 		openDB();
@@ -42,6 +42,10 @@ public class DbSqlite {
 	
 	public SQLiteDatabase getSQLiteDatabase(){
 		return mSQLiteDatabase;
+	}
+	
+	Context getContext(){
+		return mContext;
 	}
 	
 	/**

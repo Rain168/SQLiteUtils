@@ -18,6 +18,11 @@ public interface IBaseDao<T> {
 	void createTable();
 
 	/**
+	 * update table, it just support add columns to table, it will check table's version if it need to update or not.
+	 */
+	void updateTable();
+	
+	/**
 	 * insert an object
 	 * 
 	 * @param model the model to insert

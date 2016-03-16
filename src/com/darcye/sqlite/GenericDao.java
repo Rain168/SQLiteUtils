@@ -1,9 +1,16 @@
 package com.darcye.sqlite;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.darcye.sqlite.DBTransction.DBTransctionInterface;
 
 
 /**
@@ -14,6 +21,8 @@ import android.content.ContentValues;
  */
 class GenericDao<T> implements IBaseDao<T> {
 
+	private static final String PREFS_TABLE_VERSION = "prefs_table_versioins";
+	
 	private Class<?> modelClazz;
 	
 	private String mTableName;
@@ -28,10 +37,41 @@ class GenericDao<T> implements IBaseDao<T> {
 	
 	@Override
 	public void createTable() {
-		String createTableSQL = SqlHelper.getCreateTableSQL(modelClazz,null);
+		String createTableSQL = SqlHelper.getCreateTableSQL(modelClazz);
 		mDb.execSQL(createTableSQL);
 	}
 
+	@Override
+	public void updateTable(){
+		final int newTableVersion = SqlHelper.getTableVersion(modelClazz);
+		final int curTableVersion = getCurTableVersion();
+		if(newTableVersion != curTableVersion){
+			new DBTransction(mDb, new DBTransctionInterface() {
+				public void onTransction() {
+					List<ResultSet> rs = mDb.query("sqlite_master", new String[]{"sql"}, "type=? AND name=?", new String[]{"table",mTableName});
+					String curTableSql = rs.get(0).getStringValue("sql");
+					Map<String,Boolean>  curColumns = getTableColumnsInfo(curTableSql);
+					List<ColumnInfo> newColumnInfos = SqlHelper.getTableColumnInfos(modelClazz);
+					int newColumnSize = newColumnInfos.size();
+					ColumnInfo newColumnInfo;
+					String newColumnName;
+					String sql;
+					for(int index = 0; index < newColumnSize ; ++index){
+						newColumnInfo = newColumnInfos.get(index);
+						newColumnName = newColumnInfo.getName().toLowerCase();
+						if(curColumns.containsKey(newColumnName)){
+							curColumns.put(newColumnName, false);
+						}else{
+							sql = SqlHelper.getAddColumnSql(mTableName, newColumnInfo);
+							mDb.execSQL(sql);
+						}
+					}
+					saveTableVersion(newTableVersion);
+				}
+			}).process();
+		}
+	}
+	
 	@Override
 	public long insert(T model) {
 		ContentValues contentValues = new ContentValues();
@@ -143,4 +183,46 @@ class GenericDao<T> implements IBaseDao<T> {
 		return pagingQuery(columns, selection, selectionArgs, null, null, orderBy, page, pageSize);
 	}
 
+	/**
+	 * get current table version 
+	 * @return
+	 */
+	private int getCurTableVersion(){
+		Context ctx = mDb.getContext();
+		SharedPreferences tableVersions = ctx.getSharedPreferences(PREFS_TABLE_VERSION, Context.MODE_PRIVATE);
+		return tableVersions.getInt(mTableName, 1);
+	}
+	
+	/**
+	 * save table version
+	 * @param t_version
+	 */
+	private void saveTableVersion(int t_version){
+		Context ctx = mDb.getContext();
+		SharedPreferences tableVersions = ctx.getSharedPreferences(PREFS_TABLE_VERSION, Context.MODE_PRIVATE);
+	    SharedPreferences.Editor editor = tableVersions.edit();
+	    editor.putInt(mTableName, t_version);
+	    editor.commit();
+	}
+	
+	/**
+	 * get table columns in createSql
+	 * @param createSql
+	 * @return map, key is column name, value default true means need to delete
+	 */
+	private  Map<String,Boolean> getTableColumnsInfo(String createSql){
+		String subSql = createSql.substring(createSql.indexOf('(') + 1, createSql.lastIndexOf(')'));
+		String[] columnInfos = subSql.split(",");
+		Map<String,Boolean> tableInfo = new HashMap<String, Boolean>();
+		
+		String columnName;
+		String columnInfo;
+		for(int i = 0; i < columnInfos.length ; ++i){
+			columnInfo = columnInfos[i].trim();
+			columnName = columnInfo.substring(0, columnInfo.indexOf(' '));
+			tableInfo.put(columnName.toLowerCase(), true);
+		}
+		
+		return tableInfo;
+	}
 }
