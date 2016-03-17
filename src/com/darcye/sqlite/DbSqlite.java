@@ -111,14 +111,14 @@ public class DbSqlite {
 	public boolean batchInsert(final String table,final List<ContentValues> listVal){
 		try {
 			openDB();
-			new DBTransction(this , new DBTransction.DBTransctionInterface(){
+			DBTransaction.transact(this , new DBTransaction.DBTransactionInterface(){
 				@Override
-				public void onTransction() {
+				public void onTransact() {
 					for (ContentValues contentValues : listVal) {
 						mSQLiteDatabase.insertOrThrow(table, null, contentValues);
 					}
 				}
-			}).process();
+			});
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();

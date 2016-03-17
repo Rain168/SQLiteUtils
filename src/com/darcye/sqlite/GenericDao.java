@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.darcye.sqlite.DBTransction.DBTransctionInterface;
 
 
 /**
@@ -46,8 +43,8 @@ class GenericDao<T> implements IBaseDao<T> {
 		final int newTableVersion = SqlHelper.getTableVersion(modelClazz);
 		final int curTableVersion = getCurTableVersion();
 		if(newTableVersion != curTableVersion){
-			new DBTransction(mDb, new DBTransctionInterface() {
-				public void onTransction() {
+			DBTransaction.transact(mDb, new DBTransaction.DBTransactionInterface() {
+				public void onTransact() {
 					List<ResultSet> rs = mDb.query("sqlite_master", new String[]{"sql"}, "type=? AND name=?", new String[]{"table",mTableName});
 					String curTableSql = rs.get(0).getStringValue("sql");
 					Map<String,Boolean>  curColumns = getTableColumnsInfo(curTableSql);
@@ -68,7 +65,7 @@ class GenericDao<T> implements IBaseDao<T> {
 					}
 					saveTableVersion(newTableVersion);
 				}
-			}).process();
+			});
 		}
 	}
 	

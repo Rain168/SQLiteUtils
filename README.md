@@ -67,12 +67,12 @@ PagingList<UserModel> pagingList = userDAO.pagingQuery(null, null, 1, 3);
 ```
 事务支持:
 ```java
-new DBTransction(this , new DBTransction.DBTransctionInterface(){
+DBTransaction.transact(mDb, new DBTransaction.DBTransactionInterface() {
 		@Override
-		public void onTransction() {
+		public void onTransact() {
 			// to do 		
 		}
-}).process();
+};
 ```
 更新表[只支持添加字段]:
 ```java
