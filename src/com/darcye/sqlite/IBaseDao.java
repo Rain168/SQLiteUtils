@@ -144,6 +144,15 @@ public interface IBaseDao<T> {
 	T queryFirstRecord(String selection,String... selectionArgs);
 	
 	/**
+	 * if your query condition have only one record, this is helpful.
+	 * @param columns
+	 * @param selection
+	 * @param selectionArgs
+	 * @return
+	 */
+	T queryFirstRecord(String[] columns,String selection,String... selectionArgs);
+	
+	/**
 	 * execute raw  sql with query
 	 * @param sql sql the SQL query. The SQL string must not be ; terminated
 	 * @param bindArgs You may include ?s in where clause in the query, which will be replaced by the values from selectionArgs. The values will be bound as Strings.

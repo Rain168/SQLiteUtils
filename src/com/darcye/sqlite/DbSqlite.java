@@ -96,9 +96,9 @@ public class DbSqlite {
 		try {
 			openDB();
 			return mSQLiteDatabase.replaceOrThrow(table, null, values);
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
-			return -1;
+			throw ex;
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class DbSqlite {
 	 * insert mutil records at one time
 	 * @param table
 	 * @param listVal
-	 * @return
+	 * @return success return true
 	 */
 	public boolean batchInsert(final String table,final List<ContentValues> listVal){
 		try {
@@ -120,9 +120,9 @@ public class DbSqlite {
 				}
 			});
 			return true;
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
-			return false;
+			throw ex;
 		}
 	}
 	
@@ -138,9 +138,9 @@ public class DbSqlite {
 		try {
 			openDB();
 			return mSQLiteDatabase.delete(table, whereClause, whereArgs);
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
-			return 0;
+			throw ex;
 		}
 	}
 
@@ -170,9 +170,9 @@ public class DbSqlite {
 				parseCursorToResult(cursor, resultList);
 				return resultList;
 			}
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
-			return null;
+			throw ex;
 		} finally {
 			if(cursor!=null)
 				cursor.close();
@@ -244,9 +244,9 @@ public class DbSqlite {
 				parseCursorToResult(cursor, resultList);
 				return resultList;
 			}
-		} catch (Exception ex) {
+		} catch (SQLException ex) {
 			ex.printStackTrace();
-			return null;
+			throw ex;
 		} finally {
 			if(cursor!=null)
 				cursor.close();
@@ -269,7 +269,7 @@ public class DbSqlite {
 			return true;
 		} catch (SQLException ex) {
 			ex.printStackTrace();
-			return false;
+			throw ex;
 		}
 	}
 
@@ -293,7 +293,7 @@ public class DbSqlite {
 			return resultList;
 		}catch(SQLException ex) {
 			ex.printStackTrace();
-			return null;
+			throw ex;
 		}finally{
 			if(cursor!=null)
 				cursor.close();

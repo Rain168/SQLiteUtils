@@ -65,11 +65,13 @@ public class ResultSet implements Serializable {
 	 *  get boolean type value
 	 *  
 	 * @param columnName
-	 * @return if the value is a "1" or "true" , return true; or is a "0" or "false", return false.
+	 * @return if the value is a "1" or "true" , return true; or is a "null" or "0" or "false", return false.
 	 * @exception ClassCastException
 	 */
 	public boolean getBooleanValue(String columnName) {
 		Object value = getValue(columnName);
+		if(value == null)
+			return false;
 		String strVal = value.toString().toLowerCase();
 		if(strVal.equals("true") || strVal.equals("1")){
 			return true;
@@ -123,12 +125,14 @@ public class ResultSet implements Serializable {
 	 * get double type value
 	 * 
 	 * @param columnName
-	 * @return 
+	 * @return null return 0
 	 * @exception ClassCastException
 	 */
 	public double getDoubleValue(String columnName) {
 		Object value = getValue(columnName);
-		if (value instanceof Double) {
+		if(value == null){
+			return 0;
+		}else if (value instanceof Double) {
 			return (Double) value;
 		} else if (value instanceof Float) {
 			return (Float) value;
@@ -168,7 +172,7 @@ public class ResultSet implements Serializable {
 	 */
 	public Date getDateValue(String columnName){
 		String value = getStringValue(columnName);
-		return DateUtils.parseStr2Date(value);
+		return value == null ? null : DateUtils.parseStr2Date(value);
 	}
 	
 	/**

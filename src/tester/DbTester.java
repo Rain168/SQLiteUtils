@@ -45,15 +45,17 @@ public class DbTester extends InstrumentationTestCase{
 	}
 	
 	public void testInsertRecord(){
-		UserModel user = new UserModel();
-		user.userName = "darcy";
-		user.idCard = System.currentTimeMillis();
-		user.isLogin = true;
-		user.weight = 60.5;
-		user.bornDate = new Date();
-		byte[] picture = {0x1,0x2,0x3,0x4};
-		user.pictrue = picture;
-		userDAO.insert(user);
+		for(int num = 0 ; num < 100; ++num){
+			UserModel user = new UserModel();
+			user.userName = "darcy";
+			user.idCard = System.currentTimeMillis();
+			user.isLogin = true;
+			user.weight = 60.5;
+			user.bornDate = new Date();
+			byte[] picture = {0x1,0x2,0x3,0x4};
+			user.pictrue = picture;
+			userDAO.insert(user);
+		}
 	}
 	
 	public void testUpdateRecord(){

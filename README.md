@@ -1,7 +1,12 @@
-﻿# SQLiteUtils
-一个简单的基于Android的Sqlite数据库的操作封装，可以让你通过操作对象来操作表，支持分页查询。
+﻿# About SQLiteUtils
+一个简单的基于Android的Sqlite数据库的操作封装，它有如下的好处:
 
-# 简单的示例代码:
+- 便捷地创建表和增添表字段
+- 通过操作对象来insert或者update表记录
+- 支持多种查询方式，支持分页查询
+- 支持事务
+
+# Quick Start:
 
 1. 定义表对应的对象，对于基本类型，请使用对象类型来声明类成员，如int用Integer。以免在update的时候出现意想不到的情况。
 ```java

@@ -143,6 +143,16 @@ class GenericDao<T> implements IBaseDao<T> {
 	}
 
 	@Override
+	public T queryFirstRecord(String[] columns, String selection,String... selectionArgs) {
+		List<T> resultList = query(columns,selection,selectionArgs,null);
+		if(resultList!=null && !resultList.isEmpty()){
+			return resultList.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
 	public List<T> queryAll() {
 		return query(null, null);
 	}
@@ -222,4 +232,5 @@ class GenericDao<T> implements IBaseDao<T> {
 		
 		return tableInfo;
 	}
+	
 }
