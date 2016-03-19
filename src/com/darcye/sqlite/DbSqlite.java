@@ -26,9 +26,10 @@ public class DbSqlite {
 	/**
 	 * constructor would create or open the database
 	 * @param context
-	 * @param dbName
+	 * @param dbPath the path of db file
 	 */
-	public DbSqlite(String dbPath) {
+	public DbSqlite(Context context,String dbPath) {
+		this.mContext = context;
 		this.dbPath = dbPath;
 		openDB();
 	}
@@ -305,7 +306,7 @@ public class DbSqlite {
 	 * open database
 	 */
 	public void openDB() {
-		if (mSQLiteDatabase.isOpen() == false)
+		if (mSQLiteDatabase == null || mSQLiteDatabase.isOpen() == false)
 			mSQLiteDatabase = SQLiteDatabase.openOrCreateDatabase(dbPath, null);
 	}
 
@@ -313,7 +314,7 @@ public class DbSqlite {
 	 * close database
 	 */
 	public void closeDB() {
-		if (mSQLiteDatabase.isOpen()) {
+		if (mSQLiteDatabase != null && mSQLiteDatabase.isOpen()) {
 			mSQLiteDatabase.close();
 		}
 	}
