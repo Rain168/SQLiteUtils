@@ -23,6 +23,11 @@ public interface IBaseDao<T> {
 	void updateTable();
 	
 	/**
+	 * delete table
+	 */
+	void deleteTable();
+	
+	/**
 	 * insert an object
 	 * 
 	 * @param model the model to insert

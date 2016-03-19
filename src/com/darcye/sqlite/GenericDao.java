@@ -70,6 +70,12 @@ class GenericDao<T> implements IBaseDao<T> {
 	}
 	
 	@Override
+	public void deleteTable() {
+		String dropTableSql = String.format("DROP TABLE %s", mTableName);
+		mDb.execSQL(dropTableSql);
+	}
+	
+	@Override
 	public long insert(T model) {
 		ContentValues contentValues = new ContentValues();
 		SqlHelper.parseModelToContentValues(model, contentValues);
