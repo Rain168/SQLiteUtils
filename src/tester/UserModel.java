@@ -6,7 +6,7 @@ import java.util.Date;
 import com.darcye.sqlite.Table;
 import com.darcye.sqlite.Table.Column;
 
-@Table(name="t_user",version=7)
+@Table(name="t_user",version=8)
 public class UserModel {
 	@Table.Column(name="user_id",type=Column.TYPE_INTEGER,isPrimaryKey=true)
 	public Integer userId;
@@ -34,6 +34,12 @@ public class UserModel {
 	
 	@Table.Column(name="new_column_2",type=Column.TYPE_INTEGER)
 	public Integer newColumn2;
+	
+	@Table.Column(name="looooooggggggggggggggggggg_name",type=Column.TYPE_INTEGER)
+	public Integer longName;
+	
+	@Table.Column(name="description",type=Column.TYPE_STRING)
+	public String article;
 	
 	@Override
 	public String toString() {
