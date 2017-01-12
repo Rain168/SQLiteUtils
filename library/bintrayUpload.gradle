@@ -1,0 +1,107 @@
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+// This is the library version used when deploying the artifact
+
+group = "io.github.yedaxia.sqliteutils" // Maven Group ID for the artifact，一般填你唯一的包名
+version = "1.0.0"
+
+def siteUrl = 'https://github.com/YeDaxia/SQLiteUtils'      // 项目的主页
+def gitUrl = 'https://github.com/YeDaxia/SQLiteUtils.git'   // Git仓库的url
+
+task makeJar(type: Jar) {
+    //指定生成的jar名
+    baseName 'sqliteutils'
+    //从哪里打包class文件
+    from('build\\intermediates\\classes\\release\\io\\github\\yedaxia\\sqliteutils\\')
+    //打包到jar后的目录结构
+    into('io/github/yedaxia/sqliteutils/')
+    //去掉不需要打包的目录和文件
+    exclude('test/', 'BuildConfig.class', 'R.class')
+    //去掉R$开头的文件
+    exclude{ it.name.startsWith('R$');}
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+    baseName 'sqliteutils'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    baseName 'sqliteutils'
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+    archives makeJar
+}
+
+// Create the pom configuration:
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
+        }
+    }
+    developers {
+        developer {
+            id "yedaxia"
+            name "yeguozhong"
+            email "guozhong.yale@gmail.com"
+        }
+    }
+}
+
+// Create the publication with the pom configuration:
+publishing {
+    publications {
+        MyPublication(MavenPublication) {
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'io.github.yedaxia'
+            artifactId 'sqliteutils'
+            version '1.0.0'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A Simple SQLite Operations Encapsulations For Android')
+                root.appendNode('name', 'SqliteUtils')
+                root.appendNode('url', 'https://github.com/YeDaxia/SQLiteUtils')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    publications = ['MyPublication']
+    pkg {
+        repo = "maven"
+        name = "SqliteUtils"    //发布到JCenter上的项目名字
+        userOrg = "darcye"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
+javadoc { //jav doc采用utf-8编码否则会报“GBK的不可映射字符”错误
+    options{
+        encoding "UTF-8"
+        charSet 'UTF-8'
+    }
+}
